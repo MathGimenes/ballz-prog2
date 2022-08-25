@@ -50,3 +50,11 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+#testes
+area_jogo*
+RNG.ods
+resources/.hiscore
+dimensoes_areajogo_quadrados.png
+todo
+links
