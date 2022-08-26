@@ -149,7 +149,7 @@ int main()
     float constante;
 
     /* booleans que controlam os estados */
-    bool new_wave = true, refresh = false, game_over = false, bola_andando = false, help_window = false, restart = false;
+    bool new_wave = true, refresh = false, game_over = false, bola_andando = false, help_window = false, restart = false, pause = false;
     int quantidade_aleatorizada;
     int quadrados_atuais = 0, powerups_atuais = 0;
 
@@ -167,7 +167,7 @@ int main()
         hiscore = atoi (str);
         free (str);
     }else{
-        hiscore_file = fopen ("resources/.hiscore", "wr");
+        hiscore_file = fopen ("resources/.hiscore", "r+");
         fprintf (hiscore_file, "0");
         hiscore = 0;
     }
@@ -197,6 +197,22 @@ int main()
         switch(event.type){
             case ALLEGRO_EVENT_TIMER:
                 if (restart){
+                    new_wave = true;
+                    refresh = false;
+                    game_over = false; 
+                    bola_andando = false; 
+                    help_window = false;
+                    restart = false;
+                    quadrados_atuais = 0; 
+                    powerups_atuais = 0;
+
+                    primeiro = false;
+                    indice_bolas = 0;
+                    quantidade_bolas = 1;
+                    wave_atual = 0;
+                    iteracoes = FRAMES / 2;
+
+
                     primeiro = false;
 
 
@@ -209,7 +225,27 @@ int main()
                         return 1;
                     }
 
+                    lista_destroi_powerup (powerups);
+                    powerups = lista_cria_powerup();
+                    if (!powerups){
+                        fprintf (stderr, "Falha ao alocar lista de powerups, terminando execucao...\n");
+                        return 1;
+                    }
 
+                    bolas[0].x = WIDTH/2;
+                    bolas[0].y = 690;
+                    bolas[0].colidiu = false;
+                    bolas[0].lancada = false;
+
+                    char *str = malloc (sizeof(char) * 32);
+                    if (!str){
+                        fprintf (stderr, "Falha ao alocar vetor que auxilia na leitura do hiscore, terminando execucao...\n");
+                        return 1;
+                    }
+                    rewind (hiscore_file);
+                    fgets (str, 31, hiscore_file);
+                    hiscore = atoi (str);
+                    free (str);
                 }
 
 
@@ -290,7 +326,7 @@ int main()
 
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
                 bolas[0].lancada = true;
-                if (!bola_andando && event.mouse.button == 1 && mousey < 680 && mousey > 100){
+                if (!bola_andando && event.mouse.button == 1 && mousey < 680 && mousey > 100 && !help_window && !pause){
                     constante = VELOCIDADE * VELOCIDADE / (((mousex - bolas[0].x) * (mousex - bolas[0].x)) + ((mousey - bolas[0].y) * (mousey - bolas[0].y))); 
                     constante = sqrtf(constante);
                     for (int i = 0; i < quantidade_bolas; i++){
@@ -305,9 +341,16 @@ int main()
             case ALLEGRO_EVENT_KEY_DOWN:
                 if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
                     done = true;
+                if (event.keyboard.keycode == ALLEGRO_KEY_F2)
+                    pause = true;
                 if (event.keyboard.keycode == ALLEGRO_KEY_F1){
-                    help_window = (help_window) ? false : true;
-
+                    if (help_window){
+                        help_window = false;
+                        al_hide_mouse_cursor (disp);
+                    }else{
+                        help_window = true;
+                        al_show_mouse_cursor (disp);
+                    }
                 }
                 break;
 
@@ -318,10 +361,10 @@ int main()
             case ALLEGRO_EVENT_MOUSE_AXES:
                 mousex = event.mouse.x;
                 mousey = event.mouse.y;
-                if (mousey < 100){
-                    al_show_mouse_cursor (disp);
-                }else
+                if (mousey > 100 && !help_window){
                     al_hide_mouse_cursor (disp);
+                }else
+                    al_show_mouse_cursor (disp);
                 break;
         }
         
@@ -418,8 +461,8 @@ int main()
                     rewind (hiscore_file);
                     fprintf (hiscore_file, "%d", wave_atual);
                 }
-                done = true;
-                }
+                pause = true;
+            }
 
 
             for (int i = 0; i < quantidade_bolas; i++){
@@ -427,7 +470,7 @@ int main()
             
             }
 
-            if (!bola_andando){
+            if (!bola_andando && !help_window && !pause){
                 if (mousey < 680 && mousey > 100){
                     al_draw_filled_circle (mousex, mousey, 5, al_map_rgb_f (1, 1, 0 ));
                     al_draw_filled_circle ((mousex + bolas[0].x)/2, (mousey + bolas[0].y)/2, 5, al_map_rgb_f (1, 1, 0 ));
@@ -456,6 +499,11 @@ int main()
                 al_draw_filled_rectangle(WIDTH/8, 200, 7*WIDTH/8, 550, al_map_rgb (80, 80, 80));
                 al_draw_multiline_text (fonte_best, al_map_rgb_f (1, 1, 1), WIDTH/8, 200, WIDTH/8 + 7*WIDTH/8, 0 , 0, "Controles:\nBotao esquerdo mouse: Lanca a bola\nMouse: Seleciona a direcao desejada\nF1: Abre esta janela de ajuda\nESC: Termina a execucao do jogo\n\nCheatcode: essejogonaotemcheatcodes");
                 al_draw_multiline_text (fonte_best, al_map_rgb_f (1, 1, 1), WIDTH/8, 550 - 3 * BEST_FONT_SIZE, WIDTH/8 + 7*WIDTH/8, 0, 0, "Autor:\nMatheus Gimenes da Silva Viana");
+            }
+
+            if (pause){
+                al_draw_filled_rectangle(WIDTH/2 - WIDTH/4, HEIGHT/2 - HEIGHT/6, WIDTH/2 + WIDTH/4, HEIGHT/2 + HEIGHT/6, al_map_rgb (80, 80, 80));
+                //al_draw_filled_rounded_rectangle ();
             }
 
             al_flip_display(); 

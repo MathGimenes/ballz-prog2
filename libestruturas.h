@@ -60,6 +60,8 @@ lista_powerup* lista_cria_powerup ();
 */
 lista_t* lista_cria ();
 
+
+lista_powerup* lista_destroi_powerup (lista_powerup* l);
 /*
  * Remove todos os elementos da lista, libera espaco e retorna NULL.
 */

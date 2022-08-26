@@ -32,6 +32,18 @@ lista_t* lista_cria (){
     return tmp;
 }
 
+lista_powerup* lista_destroi_powerup (lista_powerup* l){
+    nodo_powerup *tmp = l->ini;
+    int i;
+    for (i=1; i <= l->tamanho; i++){
+        l->ini = l->ini->prox;
+        free (tmp);
+        tmp = l->ini;
+    }
+    free (l);
+    l = NULL;
+    return l;
+}
 
 lista_t* lista_destroi (lista_t* l){
     nodo_l_t *tmp = l->ini;
