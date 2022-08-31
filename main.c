@@ -349,7 +349,8 @@ int main()
                         al_hide_mouse_cursor (disp);
                     }else{
                         help_window = true;
-                        al_show_mouse_cursor (disp);
+                        if (!pause)
+                            al_show_mouse_cursor (disp);
                     }
                 }
                 break;
@@ -502,8 +503,10 @@ int main()
             }
 
             if (pause){
-                al_draw_filled_rectangle(WIDTH/2 - WIDTH/4, HEIGHT/2 - HEIGHT/6, WIDTH/2 + WIDTH/4, HEIGHT/2 + HEIGHT/6, al_map_rgb (80, 80, 80));
-                //al_draw_filled_rounded_rectangle ();
+                al_draw_filled_rectangle(WIDTH/2 - WIDTH/4, HEIGHT/2 - HEIGHT/6, WIDTH/2 + WIDTH/4, HEIGHT/2 - HEIGHT/6 + 175, al_map_rgb (80, 80, 80));
+                al_show_mouse_cursor (disp);
+                al_draw_filled_rounded_rectangle (WIDTH/2 - WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 25, WIDTH/2 + WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 75, 25, 25, al_map_rgb_f (1, 0, 0));
+                al_draw_filled_rounded_rectangle (WIDTH/2 - WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 100, WIDTH/2 + WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 150, 25, 25, al_map_rgb_f (1, 0, 0));
             }
 
             al_flip_display(); 

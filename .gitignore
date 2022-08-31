@@ -52,7 +52,8 @@ Mkfile.old
 dkms.conf
 
 #testes
-area_jogo*
+area_jogo
+area_jogo.c
 RNG.ods
 resources/.hiscore
 dimensoes_areajogo_quadrados.png
