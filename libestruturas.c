@@ -143,13 +143,16 @@ int lista_retira_elemento (lista_t *l, int *elemento){
         tmp = tmp->prox;
     }
     if (tmp->elemento == *elemento){
-        if (l->tamanho == 1 || i ==1){
+        if (l->tamanho == 1 || i == 1){
             lista_retira_inicio (l, elemento);
             return 1;
         }
-        aux->prox = tmp->prox;
-        free (tmp);
-        tmp = NULL;
+        else{
+            aux->prox = tmp->prox;
+            free (tmp);
+            tmp = NULL;
+        }
+
         l->tamanho--;
         return 1;
     }

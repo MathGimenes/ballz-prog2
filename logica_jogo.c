@@ -13,6 +13,10 @@
 #define SQUARE_EDGE 62
 #define GAP_SIZE 5
 
+#define new_max(x,y) (((x) >= (y)) ? (x) : (y))
+#define new_min(x,y) (((x) <= (y)) ? (x) : (y))
+
+
 
 bool colide_parede (float *x){
     if (*x + RAIO > WIDTH){
@@ -45,34 +49,49 @@ bool colide_piso (float y){
     return false;
 }
 
+
+
+
+
 bool colide_quadrado (BOLA *bola, QUADRADO* quadrado){
     float distanciax = fabs (bola->x - quadrado->cx), distanciay = fabs (bola->y - quadrado->cy);
 
-    if (distanciax > (SQUARE_EDGE/2 + RAIO))
+    if (distanciax > ((float)SQUARE_EDGE/2 + RAIO))
         return false;
-    if (distanciay > (SQUARE_EDGE/2 + RAIO))
+    if (distanciay > ((float)SQUARE_EDGE/2 + RAIO + GAP_SIZE/2))
         return false;
     
-    if (distanciax <= (SQUARE_EDGE/2)){
-        bola->vy *= -1;
-        return true;
+    if ((distanciax <= ((float)SQUARE_EDGE/2 + RAIO)) && distanciay < distanciax){
+        if (distanciax - distanciay > 3){
+            bola->vx *= -1;
+            return true;
+        }
     }
-    if (distanciay <= (SQUARE_EDGE/2)){
-        bola->vx *= -1;
-        return true;
+    if (distanciay <= ((float)SQUARE_EDGE/2 + RAIO + GAP_SIZE/2)){
+        if (distanciay - distanciax > 3){
+            bola->vy *= -1;
+            return true;
+        }
     }
     
-    
-    float distancia_pontos = ((distanciax - SQUARE_EDGE/2) * (distanciax - SQUARE_EDGE/2)) + ((distanciay - SQUARE_EDGE/2) * (distanciay - SQUARE_EDGE/2));
+    float distancia_pontos = ((distanciax - SQUARE_EDGE/2) * (distanciax - SQUARE_EDGE/2)) + ((distanciay - SQUARE_EDGE/2 ) * (distanciay - SQUARE_EDGE/2 ));
 
-    if (distancia_pontos <= (RAIO * RAIO)){
-        bola->vy *= -1;
-        bola->vx *= -1;
+    if (distancia_pontos <= (RAIO * RAIO )){
+        if (fabs (bola->vx) > fabs (bola->vy))
+            bola->vx *= -1;
+        else if (fabs (bola->vy) > fabs (bola->vx))
+            bola->vy *= -1;
+        else{
+            bola->vx *= -1;
+            bola->vy *= -1;
+        } 
+
         return true;
     }
-    
+
     return false;
 }
+
 
 bool colide_powerup (BOLA* bola, POWERUP *powerup){
     float distanciax = fabs (bola->x - powerup->cx), distanciay = fabs (bola->y - powerup->cy);
