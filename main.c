@@ -520,12 +520,7 @@ int main() {
             
             
             
-            aux_powerup = powerups->ini;
-            for (int i = 0; i < powerups->tamanho; i++){
-                al_draw_filled_circle (aux_powerup->powerup.cx, aux_powerup->powerup.cy, 15, al_map_rgb_f(1, 1, 1));
-                aux_powerup = aux_powerup->prox;
-            }
-            //desenhar_powerups (aux_powerup, powerups);
+            desenhar_powerups (aux_powerup, powerups);
 
             aux = quadrados->ini;
             for (int i = 0; i < quadrados->tamanho; i++){
