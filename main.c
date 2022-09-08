@@ -4,10 +4,12 @@
 #include <math.h>
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_color.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 
 #include "libestruturas.h"
 #include "rng.h"
@@ -58,7 +60,7 @@ int main() {
     inicializar (al_init(), "allegro");
 
     /* iniciando teclado e mouse */
-    inicializar (al_install_keyboard(), "keyboard");
+    inicializar (al_install_keyboard(), "teclado");
     inicializar (al_install_mouse(), "mouse");
 
     /* iniciando timer, 1 evento a cada 1/60 segundos */
@@ -75,6 +77,29 @@ int main() {
     al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
     al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
 
+    /* iniciando audio */
+    inicializar (al_install_audio(), "audio");
+    inicializar (al_init_acodec_addon(), "codeec de audio");
+    inicializar (al_reserve_samples(5), "reserve samples");
+
+    /* iniciando efeitos de som */
+    ALLEGRO_SAMPLE* game_over_som = al_load_sample("resources/game_over.wav");
+    inicializar (game_over_som, "som game over");
+
+    ALLEGRO_SAMPLE* clique = al_load_sample("resources/clique.wav");
+    inicializar (clique, "som clique");
+
+    ALLEGRO_SAMPLE*  new_game = al_load_sample("resources/new_game.ogg");
+    inicializar (new_game, "som new_game");
+
+    ALLEGRO_SAMPLE*  lancamento = al_load_sample("resources/lancamento.wav");
+    inicializar (lancamento, "som lancamento");
+
+    ALLEGRO_SAMPLE*  powerup_som = al_load_sample("resources/powerup.wav");
+    inicializar (powerup_som, "som powerup");
+
+    ALLEGRO_SAMPLE*  chao = al_load_sample("resources/chao.wav");
+    inicializar (chao, "som chao");
     
     
     /* criando display */
@@ -82,28 +107,28 @@ int main() {
     inicializar (disp, "display");
 
     /* addon de fontes */
-    inicializar (al_init_font_addon(), "addon font");
-    inicializar (al_init_ttf_addon(), "addon ttf");
+    inicializar (al_init_font_addon(), "addon de fontes");
+    inicializar (al_init_ttf_addon(), "addon de fontes ttf");
 
     /* inicializando fonte dos numeros dos quadrados */
     ALLEGRO_FONT* fonte_quadrado = al_load_ttf_font("resources/font.otf", SQUARE_FONT_SIZE, 0);
-    inicializar (fonte_quadrado, "fonte");
+    inicializar (fonte_quadrado, "fonte_quadrado");
 
     /* inicilizando fonte score */
     ALLEGRO_FONT* fonte_score = al_load_ttf_font("resources/font.otf", SCORE_FONT_SIZE, 0);
-    inicializar (fonte_score, "fonte");
+    inicializar (fonte_score, "fonte_score");
 
     /* inicializando fonte "best" */
     ALLEGRO_FONT* fonte_best = al_load_ttf_font("resources/font.otf", BEST_FONT_SIZE, 0);
-    inicializar (fonte_best, "fonte");
+    inicializar (fonte_best, "fonte_best");
 
     /* inicializando fonte do hiscore */
     ALLEGRO_FONT* fonte_hiscore = al_load_ttf_font("resources/font.otf", HISCORE_FONT_SIZE, 0);
-    inicializar (fonte_hiscore, "fonte");
+    inicializar (fonte_hiscore, "fonte_hiscore");
 
 
     /* iniciando addon de primitivas */
-    inicializar (al_init_primitives_addon(), "primitives");
+    inicializar (al_init_primitives_addon(), "addon de primitivas");
 
     /* registrando as fontes de eventos na fila de eventos */
     al_register_event_source(queue, al_get_keyboard_event_source());
@@ -204,6 +229,7 @@ int main() {
     /* inicializando timer que controla os frames */
     al_start_timer(timer);
     
+    al_play_sample(new_game, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
     while(1) {
         al_wait_for_event(queue, &event);
 
@@ -236,8 +262,10 @@ int main() {
                     for (int i = 0; i < quadrados->tamanho; i++){
                         aux->quadrado.y += speed_quadrados;
                         aux->quadrado.cy += speed_quadrados;
-                        if (aux->quadrado.y > 630)
+                        if (aux->quadrado.y > 630){
                             game_over = true;
+                            al_play_sample(game_over_som, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                        }
                         aux = aux->prox;
 
                     }
@@ -272,6 +300,8 @@ int main() {
             
                 /* voltando ao estado inicial */
                 if (restart){
+                    al_stop_samples();
+                    al_play_sample(new_game, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                     new_wave = true;
                     refresh = false;
                     game_over = false; 
@@ -353,6 +383,8 @@ int main() {
                             contador_colisoes++;
                         }
                         if (contador_colisoes == quantidade_bolas){
+                            al_stop_samples();
+                            al_play_sample(chao, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                             for (int i = 0; i < quantidade_bolas; i++){
                                 bolas[i].colidiu = false;
                             }
@@ -389,6 +421,8 @@ int main() {
                         for (int i = 0; i < powerups->tamanho; i++){
                             bool aux_colisao = colide_powerup (&bolas[j], &aux_powerup->powerup);
                             if (aux_colisao){
+                                al_stop_samples();
+                                al_play_sample(powerup_som, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                                 elemento = aux_powerup->elemento;
                                 aux_powerup = aux_powerup->prox;
                                 lista_retira_elemento_powerup (powerups, &elemento);
@@ -404,26 +438,16 @@ int main() {
 
                 /* parte que calcula as novas posicoes */
                 if (bola_andando){
-                for (int i = 0; i < quantidade_bolas; i++){
-                    if (i){
-                        if (bolas[i - 1].lancada){
-                            float distancia_quadrada = (float)(bolas[i - 1].x - bolas[i].x) * (bolas[i - 1].x - bolas[i].x) + (bolas[i - 1].y - bolas[i].y) * (bolas[i - 1].y - bolas[i].y);
-                            if (distancia_quadrada > (RAIO * 2 + 25) * (RAIO * 2 + 25))
-                                bolas[i].lancada = true;
-                        }
-                    }
-                    if (!bolas[i].colidiu && bolas[i].lancada){
-                        bolas[i].x += bolas[i].vx;
-                        bolas[i].y += bolas[i].vy;
-                    }
+                    posicao_bolas (bolas, quantidade_bolas);
                 }
-            }
                 redraw = true;
                 break;
 
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
                 /* calcula a direcao quando o usuario aperta o botao do mouse */
                 if (!bola_andando  && mousey < 680 && mousey > 100 && !help_window && !pause && !game_over){
+                    al_stop_samples();
+                    al_play_sample(lancamento, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                     bolas[0].lancada = true;
                     constante = VELOCIDADE * VELOCIDADE / (((mousex - bolas[0].x) * (mousex - bolas[0].x)) + ((mousey - bolas[0].y) * (mousey - bolas[0].y))); 
                     constante = sqrtf(constante);
@@ -438,18 +462,23 @@ int main() {
                 if (pause){
                     /* botao continue */
                     float posx1 = WIDTH/2 - WIDTH/4.5, posx2 = WIDTH/2 + WIDTH/4.5; 
-                    if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 25 && mousey < HEIGHT/2 - HEIGHT/6 + 75))
+                    if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 25 && mousey < HEIGHT/2 - HEIGHT/6 + 75)){
                         pause = false;
+                        al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                    }
                     
                     /* botao restart */
                     if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 100 && mousey < HEIGHT/2 - HEIGHT/6 + 150)){
                         pause = false;
                         restart = true;
+                        al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                     }
 
                     /* botao quit */
-                    if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 175 && mousey < HEIGHT/2 - HEIGHT/6 + 225))
+                    if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 175 && mousey < HEIGHT/2 - HEIGHT/6 + 225)){
+                        al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                         done = true;
+                    }
                 }
 
                 /* teste se o usuario apertou o botao na tela de game over */
@@ -457,19 +486,26 @@ int main() {
                     float posx1 = WIDTH/2 - WIDTH/4.5, posx2 = WIDTH/2 + WIDTH/4.5; 
                     /* botao restart */
                     if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 100 && mousey < HEIGHT/2 - HEIGHT/6 + 150)){
+                        al_stop_samples ();
+                        al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                         pause = false;
                         restart = true;
                     }
 
                     /* botao quit */
-                    if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 175 && mousey < HEIGHT/2 - HEIGHT/6 + 225))
+                    if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 175 && mousey < HEIGHT/2 - HEIGHT/6 + 225)){
+                        al_stop_samples ();
+                        al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                         done = true;
+                    }
                 }
 
                 
                 /* testa se o usuario apertou o botao de pause */
-                if ((mousex > WIDTH/20  &&  mousex < WIDTH/20 + 2 * PAUSE_WIDTH + 10) && (mousey > 20 && mousey < 20 + PAUSE_HEIGHT))
+                if ((mousex > WIDTH/20  &&  mousex < WIDTH/20 + 2 * PAUSE_WIDTH + 10) && (mousey > 20 && mousey < 20 + PAUSE_HEIGHT)){
+                    al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                     pause = pause ? false:true;
+                }
 
 
                 break;
@@ -521,21 +557,10 @@ int main() {
             
             /* cor do fundo */
             al_clear_to_color(al_map_rgb(32,32, 32));
-
-            
-            
             
             desenhar_powerups (aux_powerup, powerups);
-
             desenhar_quadrados (aux, quadrados, fonte_quadrado);
-
             desenhar_bolas (quantidade_bolas, bolas);
-            
-
-
-
-
- 
 
             if (!bola_andando && !help_window && !pause && !game_over){
                 desenhar_caminho_cursor (mousex, mousey, bolas);
@@ -543,17 +568,8 @@ int main() {
             }
             
             desenha_faixas();
-
-            al_draw_textf (fonte_score, al_map_rgb_f (1, 1, 1), WIDTH/2, 0, 1, "%d", wave_atual);
-            al_draw_text (fonte_best, al_map_rgb_f (1, 1, 1), WIDTH/6, 5, 1, "BEST");
-            al_draw_textf (fonte_hiscore, al_map_rgb_f (1, 1, 1), WIDTH/6, 15, 1, "%d", hiscore);
-
-
-            for (int i = 0; i < 11; i += 10){
-                al_draw_filled_rounded_rectangle (WIDTH/20 + i, 20, WIDTH/20 + PAUSE_WIDTH + i, 20 + PAUSE_HEIGHT , PAUSE_WIDTH/2, PAUSE_WIDTH/2, al_map_rgb (70, 70, 70));
-            }
-            
-            
+            desenha_fontes (fonte_hiscore, fonte_score, fonte_best, wave_atual, hiscore);
+            desenha_botao_pause();
 
             if (help_window){
                 desenha_ajuda (fonte_best);
@@ -578,8 +594,10 @@ int main() {
 
     free (vetor_posicoes);
     free (bolas);
+    fclose (hiscore_file);
     lista_destroi (quadrados); 
     lista_destroi_powerup (powerups);
+
 
 
 
@@ -587,10 +605,14 @@ int main() {
     al_destroy_font(fonte_best);
     al_destroy_font(fonte_hiscore);
     al_destroy_font(fonte_score);
+    al_destroy_sample(game_over_som);
+    al_destroy_sample(new_game);
+    al_destroy_sample(clique);
+    al_destroy_sample(lancamento);
     al_destroy_display(disp);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
-    fclose (hiscore_file);
+
 
     return 0;
 }

@@ -110,3 +110,17 @@ void desenha_game_over(ALLEGRO_FONT* fonte_hiscore){
     al_draw_filled_rounded_rectangle (WIDTH/2 - WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 175, WIDTH/2 + WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 225, 25, 25, al_map_rgb (0, 163, 150));
     al_draw_text (fonte_hiscore, al_map_rgb_f (1, 1, 1), WIDTH/2, ((HEIGHT/2 - HEIGHT/6 + 175) + (HEIGHT/2 - HEIGHT/6 + 225))/2 - HISCORE_FONT_SIZE/1.5, 1, "QUIT");
 }
+
+
+void desenha_fontes(ALLEGRO_FONT* fonte_hiscore, ALLEGRO_FONT* fonte_score, ALLEGRO_FONT* fonte_best, int wave_atual, int hiscore){
+    al_draw_textf (fonte_score, al_map_rgb_f (1, 1, 1), WIDTH/2, 0, 1, "%d", wave_atual);
+    al_draw_text (fonte_best, al_map_rgb_f (1, 1, 1), WIDTH/6, 5, 1, "BEST");
+    al_draw_textf (fonte_hiscore, al_map_rgb_f (1, 1, 1), WIDTH/6, 15, 1, "%d", hiscore);
+}
+
+void desenha_botao_pause(){
+    for (int i = 0; i < 11; i += 10){
+        al_draw_filled_rounded_rectangle (WIDTH/20 + i, 20, WIDTH/20 + PAUSE_WIDTH + i, 20 + PAUSE_HEIGHT , PAUSE_WIDTH/2, PAUSE_WIDTH/2, al_map_rgb (70, 70, 70));
+    }
+            
+}

@@ -4,7 +4,7 @@
 #flags de compilacao
 CFLAGS = -Wall -std=c99 -g
 
-ALLEGRO = -lallegro_image  -lallegro_primitives  -lallegro_dialog  -lallegro_ttf -lallegro_font -lallegro_ttf -lallegro -lm
+ALLEGRO = -lallegro_image  -lallegro_primitives  -lallegro_dialog  -lallegro_ttf -lallegro_font -lallegro_ttf -lallegro_audio -lallegro_acodec -lallegro -lm
 OBJS = libestruturas.o rng.o main.o logica_jogo.o graficos.o
 
 PROGS = main

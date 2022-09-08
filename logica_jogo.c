@@ -134,3 +134,19 @@ void corrigir_x (float *x){
     else if (*x > WIDTH - RAIO)
         *x = WIDTH - RAIO;
 }
+
+void posicao_bolas (BOLA* bolas, int quantidade_bolas){
+    for (int i = 0; i < quantidade_bolas; i++){
+        if (i){
+            if (bolas[i - 1].lancada){
+                float distancia_quadrada = (float)(bolas[i - 1].x - bolas[i].x) * (bolas[i - 1].x - bolas[i].x) + (bolas[i - 1].y - bolas[i].y) * (bolas[i - 1].y - bolas[i].y);
+                if (distancia_quadrada > (RAIO * 2 + 25) * (RAIO * 2 + 25))
+                    bolas[i].lancada = true;
+            }
+        }
+        if (!bolas[i].colidiu && bolas[i].lancada){
+            bolas[i].x += bolas[i].vx;
+            bolas[i].y += bolas[i].vy;
+        }
+    }
+}
