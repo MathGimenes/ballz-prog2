@@ -40,12 +40,12 @@ void inicializar (bool teste, const char *descricao){
 
 bool existe_hiscore (){
     FILE *hiscore = fopen ("resources/.hiscore", "r");
-    if (hiscore == NULL){
-        return false;
-    }
-    else{
+    if (hiscore != NULL){
         fclose (hiscore);
         return true;
+    }
+    else{
+        return false;
     }
 
 }
@@ -236,8 +236,13 @@ int main() {
                     for (int i = 0; i < quadrados->tamanho; i++){
                         aux->quadrado.y += speed_quadrados;
                         aux->quadrado.cy += speed_quadrados;
+                        if (aux->quadrado.y > 630)
+                            game_over = true;
                         aux = aux->prox;
+
                     }
+
+
 
                     if (wave_atual > 1){
                         aux_powerup = powerups->ini;
@@ -522,38 +527,22 @@ int main() {
             
             desenhar_powerups (aux_powerup, powerups);
 
-            aux = quadrados->ini;
-            for (int i = 0; i < quadrados->tamanho; i++){
-                al_draw_filled_rectangle(aux->quadrado.x, aux->quadrado.y, aux->quadrado.x + (SQUARE_EDGE), aux->quadrado.y + (SQUARE_EDGE), al_map_rgb_f(1, 0, 0));
-                al_draw_textf (fonte_quadrado, al_map_rgb_f (0, 0, 0), aux->quadrado.x + SQUARE_EDGE/2, aux->quadrado.y + SQUARE_FONT_SIZE/2, 1, "%d", aux->quadrado.batidas);
-                if (aux->quadrado.y > 630)
-                    game_over = true;
-                aux = aux->prox;  
-            }
+            desenhar_quadrados (aux, quadrados, fonte_quadrado);
 
+            desenhar_bolas (quantidade_bolas, bolas);
             
 
 
 
 
-            for (int i = 0; i < quantidade_bolas; i++){
-                al_draw_filled_circle (bolas[i].x, bolas[i].y, RAIO, al_map_rgb_f (1, 0, 1 ));
-            
-            }
+ 
 
             if (!bola_andando && !help_window && !pause && !game_over){
-                if (mousey < 680 && mousey > 100){
-                    al_draw_filled_circle (mousex, mousey, 5, al_map_rgb_f (1, 1, 0 ));
-                    al_draw_filled_circle ((mousex + bolas[0].x)/2, (mousey + bolas[0].y)/2, 5, al_map_rgb_f (1, 1, 0 ));
-                    al_draw_filled_circle ((((mousex + bolas[0].x)/2) + mousex)/2, (((mousey + bolas[0].y)/2) + mousey)/2, 5, al_map_rgb_f (1, 1, 0 ));
-                }
+                desenhar_caminho_cursor (mousex, mousey, bolas);
                 al_draw_textf (fonte_best, al_map_rgb_f (1, 1, 1), bolas[0].x, bolas[0].y - BEST_FONT_SIZE * 1.8, 1, "x%d", quantidade_bolas);
             }
-            /* faixa de cima */
-            al_draw_filled_rectangle(0, 0, WIDTH, 100, al_map_rgb(38, 38, 38));
-
-            /* faixa de baixo */
-            al_draw_filled_rectangle(0, 698, 480, HEIGHT, al_map_rgb(38, 38, 38));
+            
+            desenha_faixas();
 
             al_draw_textf (fonte_score, al_map_rgb_f (1, 1, 1), WIDTH/2, 0, 1, "%d", wave_atual);
             al_draw_text (fonte_best, al_map_rgb_f (1, 1, 1), WIDTH/6, 5, 1, "BEST");
@@ -567,46 +556,18 @@ int main() {
             
 
             if (help_window){
-                al_draw_filled_rectangle(WIDTH/8, 200, 7*WIDTH/8, 550, al_map_rgb (80, 80, 80));
-                al_draw_multiline_text (fonte_best, al_map_rgb_f (1, 1, 1), WIDTH/8, 200, WIDTH/8 + 7*WIDTH/8, 0 , 0, "Controles:\nBotao esquerdo mouse: Lanca a bola\nMouse: Seleciona a direcao desejada\nF1: Abre esta janela de ajuda\nF2: Pausa o jogo\nESC: Termina a execucao do jogo\n\nCheatcode: essejogonaotemcheatcodes");
-                al_draw_multiline_text (fonte_best, al_map_rgb_f (1, 1, 1), WIDTH/8, 550 - 3 * BEST_FONT_SIZE, WIDTH/8 + 7*WIDTH/8, 0, 0, "Autor:\nMatheus Gimenes da Silva Viana");
+                desenha_ajuda (fonte_best);
             }
 
             if (pause){
-                /* fundo */
-                al_draw_filled_rectangle(WIDTH/2 - WIDTH/4, HEIGHT/2 - HEIGHT/6, WIDTH/2 + WIDTH/4, HEIGHT/2 - HEIGHT/6 + 250, al_map_rgb (80, 80, 80));
                 al_show_mouse_cursor (disp);
+                desenha_pause (fonte_hiscore);
 
-                /* botoes */
-                
-                /* continue */
-                al_draw_filled_rounded_rectangle (WIDTH/2 - WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 25, WIDTH/2 + WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 75, 25, 25, al_map_rgb (234, 34, 94));
-                al_draw_text (fonte_hiscore, al_map_rgb_f (1, 1, 1), WIDTH/2, (((HEIGHT/2 - HEIGHT/6 + 25) + (HEIGHT/2 - HEIGHT/6 + 75))/2) - HISCORE_FONT_SIZE/1.5, 1, "CONTINUE");
-                
-                /* restart */
-                al_draw_filled_rounded_rectangle (WIDTH/2 - WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 100, WIDTH/2 + WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 150, 25, 25, al_map_rgb (245, 181, 46));
-                al_draw_text (fonte_hiscore, al_map_rgb_f (1, 1, 1), WIDTH/2, ((HEIGHT/2 - HEIGHT/6 + 100) + (HEIGHT/2 - HEIGHT/6 + 150))/2 - HISCORE_FONT_SIZE/1.5, 1, "RESTART");
-
-                /* quit */
-                al_draw_filled_rounded_rectangle (WIDTH/2 - WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 175, WIDTH/2 + WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 225, 25, 25, al_map_rgb (0, 163, 150));
-                al_draw_text (fonte_hiscore, al_map_rgb_f (1, 1, 1), WIDTH/2, ((HEIGHT/2 - HEIGHT/6 + 175) + (HEIGHT/2 - HEIGHT/6 + 225))/2 - HISCORE_FONT_SIZE/1.5, 1, "QUIT");
             }
 
             if (game_over){
-                /* fundo */
-                al_draw_filled_rectangle(WIDTH/2 - WIDTH/4, HEIGHT/2 - HEIGHT/6 + 75, WIDTH/2 + WIDTH/4, HEIGHT/2 - HEIGHT/6 + 250, al_map_rgb (80, 80, 80));
                 al_show_mouse_cursor (disp);
-
-                /* botoes */
-
-                /* restart */
-                al_draw_filled_rounded_rectangle (WIDTH/2 - WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 100, WIDTH/2 + WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 150, 25, 25, al_map_rgb (245, 181, 46));
-                al_draw_text (fonte_hiscore, al_map_rgb_f (1, 1, 1), WIDTH/2, ((HEIGHT/2 - HEIGHT/6 + 100) + (HEIGHT/2 - HEIGHT/6 + 150))/2 - HISCORE_FONT_SIZE/1.5, 1, "RESTART");
-
-                /* quit */
-                al_draw_filled_rounded_rectangle (WIDTH/2 - WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 175, WIDTH/2 + WIDTH/4.5, HEIGHT/2 - HEIGHT/6 + 225, 25, 25, al_map_rgb (0, 163, 150));
-                al_draw_text (fonte_hiscore, al_map_rgb_f (1, 1, 1), WIDTH/2, ((HEIGHT/2 - HEIGHT/6 + 175) + (HEIGHT/2 - HEIGHT/6 + 225))/2 - HISCORE_FONT_SIZE/1.5, 1, "QUIT");
-
+                desenha_game_over (fonte_hiscore);
             }
 
             al_flip_display(); 
