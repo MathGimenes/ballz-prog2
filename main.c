@@ -12,6 +12,7 @@
 #include "libestruturas.h"
 #include "rng.h"
 #include "logica_jogo.h"
+#include "graficos.h"
 
 #define WIDTH 480
 #define HEIGHT 854
@@ -209,7 +210,7 @@ int main() {
         switch(event.type){
             case ALLEGRO_EVENT_TIMER:
                 
-            
+                /* aleatoriza as novas posicoes de powerups/quadrados */
                 if (new_wave){
                     quantidade_aleatorizada = aleatorizar_wave();
                     aleatorizar_posicoes (vetor_posicoes, quantidade_aleatorizada);
@@ -229,6 +230,7 @@ int main() {
 
                 }
                 
+                /* atualiza a tela */
                 if (refresh){
                     aux = quadrados->ini;
                     for (int i = 0; i < quadrados->tamanho; i++){
@@ -254,7 +256,8 @@ int main() {
                     }
                 
                 }
-
+                
+                /* atualizando hiscore caso ele seja maior */
                 if (game_over || restart){
                     if (wave_atual > hiscore){
                         rewind (hiscore_file);
@@ -262,7 +265,7 @@ int main() {
                     }
                 }
             
-                
+                /* voltando ao estado inicial */
                 if (restart){
                     new_wave = true;
                     refresh = false;
@@ -317,7 +320,7 @@ int main() {
 
 
 
-
+                /* parte que toma conta das colisoes */
                 if (bola_andando){
                     int contador_colisoes = 0; 
                     
@@ -394,7 +397,7 @@ int main() {
 
                 }
 
-
+                /* parte que calcula as novas posicoes */
                 if (bola_andando){
                 for (int i = 0; i < quantidade_bolas; i++){
                     if (i){
@@ -414,8 +417,9 @@ int main() {
                 break;
 
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                bolas[0].lancada = true;
+                /* calcula a direcao quando o usuario aperta o botao do mouse */
                 if (!bola_andando  && mousey < 680 && mousey > 100 && !help_window && !pause && !game_over){
+                    bolas[0].lancada = true;
                     constante = VELOCIDADE * VELOCIDADE / (((mousex - bolas[0].x) * (mousex - bolas[0].x)) + ((mousey - bolas[0].y) * (mousey - bolas[0].y))); 
                     constante = sqrtf(constante);
                     for (int i = 0; i < quantidade_bolas; i++){
@@ -425,6 +429,7 @@ int main() {
                     }
                 }
 
+                /* teste se o usuario apertou o botao na tela de pause*/
                 if (pause){
                     /* botao continue */
                     float posx1 = WIDTH/2 - WIDTH/4.5, posx2 = WIDTH/2 + WIDTH/4.5; 
@@ -442,6 +447,7 @@ int main() {
                         done = true;
                 }
 
+                /* teste se o usuario apertou o botao na tela de game over */
                 if (game_over){
                     float posx1 = WIDTH/2 - WIDTH/4.5, posx2 = WIDTH/2 + WIDTH/4.5; 
                     /* botao restart */
@@ -456,7 +462,7 @@ int main() {
                 }
 
                 
-
+                /* testa se o usuario apertou o botao de pause */
                 if ((mousex > WIDTH/20  &&  mousex < WIDTH/20 + 2 * PAUSE_WIDTH + 10) && (mousey > 20 && mousey < 20 + PAUSE_HEIGHT))
                     pause = pause ? false:true;
 
@@ -464,10 +470,15 @@ int main() {
                 break;
 
             case ALLEGRO_EVENT_KEY_DOWN:
+                /* sai do jogo */
                 if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
                     done = true;
+                
+                /* inicia a tela de pause */
                 if (event.keyboard.keycode == ALLEGRO_KEY_F2)
                     pause = pause ? false:true;
+                
+                /* mostra a tela de ajuda */
                 if (event.keyboard.keycode == ALLEGRO_KEY_F1){
                     if (help_window){
                         help_window = false;
@@ -487,6 +498,8 @@ int main() {
             case ALLEGRO_EVENT_MOUSE_AXES:
                 mousex = event.mouse.x;
                 mousey = event.mouse.y;
+
+                /* escondendo o mouse na area de jogo */
                 if (mousey > 100 && !help_window){
                     al_hide_mouse_cursor (disp);
                 }else
@@ -499,19 +512,20 @@ int main() {
         if(done) 
             break;
 
-        if(redraw && al_is_event_queue_empty(queue))
-        {
+        if(redraw && al_is_event_queue_empty(queue)) {
+            
+            /* cor do fundo */
             al_clear_to_color(al_map_rgb(32,32, 32));
 
             
             
-
+            
             aux_powerup = powerups->ini;
             for (int i = 0; i < powerups->tamanho; i++){
                 al_draw_filled_circle (aux_powerup->powerup.cx, aux_powerup->powerup.cy, 15, al_map_rgb_f(1, 1, 1));
                 aux_powerup = aux_powerup->prox;
             }
-
+            //desenhar_powerups (aux_powerup, powerups);
 
             aux = quadrados->ini;
             for (int i = 0; i < quadrados->tamanho; i++){
