@@ -32,27 +32,6 @@
 #define PAUSE_HEIGHT 25
 #define PAUSE_WIDTH 5
 
-void inicializar (bool teste, const char *descricao){
-    if(teste) 
-        return;
-
-    printf("Nao foi possivel inicializar %s\n", descricao);
-    exit(1);
-}
-
-bool existe_hiscore (){
-    FILE *hiscore = fopen ("resources/.hiscore", "r");
-    if (hiscore != NULL){
-        fclose (hiscore);
-        return true;
-    }
-    else{
-        return false;
-    }
-
-}
-
-
 int main() {
     srand (time(NULL));
 
@@ -185,9 +164,18 @@ int main() {
     float constante;
 
     /* booleans que controlam os estados */
-    bool new_wave = true, refresh = false, game_over = false, bola_andando = false, help_window = false, restart = false, pause = false;
+    bool new_wave = true, refresh = false, game_over = false, bola_andando = false, help_window = false, restart = false, pause = false, cheatcode = false, digitando_cheatcode = false;
     int quantidade_aleatorizada;
     int quadrados_atuais = 0, powerups_atuais = 0;
+
+    /* string que verifica o cheatcode */
+    char* string_cheatcode = malloc(sizeof(char)*25);
+    if (!string_cheatcode){
+        fprintf (stderr, "Falha ao alocar string de cheatcode, terminando execucao...\n");
+        exit(1);
+    }
+    string_cheatcode[0] = 'e';
+    int caracteres_cheatcode;
 
     /* lendo o hiscore (cria um arquivo de hiscore caso nao exista) */
     int hiscore;
@@ -401,7 +389,7 @@ int main() {
                             if (!colidiu_laco){
                                 aux_colisao = colide_quadrado (&bolas[j], &aux->quadrado);
                                 if (aux_colisao){
-                                    aux->quadrado.batidas--;
+                                    aux->quadrado.batidas = cheatcode ? 0:aux->quadrado.batidas - 1;
                                     elemento = aux->elemento;
                                     colidiu_laco = true;
 
@@ -519,6 +507,7 @@ int main() {
                 if (event.keyboard.keycode == ALLEGRO_KEY_F2)
                     pause = pause ? false:true;
                 
+
                 /* mostra a tela de ajuda */
                 if (event.keyboard.keycode == ALLEGRO_KEY_F1){
                     if (help_window){
@@ -530,6 +519,24 @@ int main() {
                             al_show_mouse_cursor (disp);
                     }
                 }
+
+
+                if (event.keyboard.keycode == ALLEGRO_KEY_E && !digitando_cheatcode){
+                    caracteres_cheatcode = 1;
+                    digitando_cheatcode = true;
+                }else if (digitando_cheatcode){
+                    caracteres_cheatcode++;
+                    if (checar_cheatcode (string_cheatcode, caracteres_cheatcode, event.keyboard.keycode + 96)){
+                        if (caracteres_cheatcode == 24){
+                            cheatcode = cheatcode ? false : true;
+                            digitando_cheatcode = false;
+                        }
+                    }else
+                        digitando_cheatcode = false;
+
+                }
+
+                
                 break;
 
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
@@ -594,6 +601,7 @@ int main() {
 
     free (vetor_posicoes);
     free (bolas);
+    free (string_cheatcode);
     fclose (hiscore_file);
     lista_destroi (quadrados); 
     lista_destroi_powerup (powerups);

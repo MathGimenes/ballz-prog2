@@ -1,4 +1,5 @@
 #include <allegro5/allegro5.h>
+#include <string.h>
 #include <math.h>
 #include <stdio.h>
 
@@ -13,8 +14,27 @@
 #define SQUARE_EDGE 62
 #define GAP_SIZE 5
 
-#define new_max(x,y) (((x) >= (y)) ? (x) : (y))
-#define new_min(x,y) (((x) <= (y)) ? (x) : (y))
+bool existe_hiscore (){
+    FILE *hiscore = fopen ("resources/.hiscore", "r");
+    if (hiscore != NULL){
+        fclose (hiscore);
+        return true;
+    }
+    else{
+        return false;
+    }
+
+}
+
+
+void inicializar (bool teste, const char *descricao){
+    if(teste) 
+        return;
+
+    printf("Nao foi possivel inicializar %s\n", descricao);
+    exit(1);
+}
+
 
 
 
@@ -150,3 +170,12 @@ void posicao_bolas (BOLA* bolas, int quantidade_bolas){
         }
     }
 }
+
+bool checar_cheatcode (char string_cheatcode[], int caracteres_cheatcode, int letra_atual){
+    string_cheatcode[caracteres_cheatcode - 1] = letra_atual;
+    
+    if (!strncmp (string_cheatcode, "essejogonaotemcheatcodes", caracteres_cheatcode))
+        return true;
+    
+    return false;
+}   
