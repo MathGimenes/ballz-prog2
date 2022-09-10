@@ -2,6 +2,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <stdio.h>
 
 #include "libestruturas.h"
 #include "graficos.h"
@@ -16,6 +17,8 @@
 #define HEIGHT 854
 #define SQUARE_EDGE 62
 #define RAIO 8
+#define RANGE_COR 204
+#define CORES 12
 
 void desenhar_powerups(nodo_powerup* aux_powerup, lista_powerup* powerups){
     aux_powerup = powerups->ini;
@@ -26,11 +29,66 @@ void desenhar_powerups(nodo_powerup* aux_powerup, lista_powerup* powerups){
 
 }
 
+ALLEGRO_COLOR cor_quadrado(int batidas){
+    int aux = batidas % RANGE_COR, faixa = RANGE_COR/CORES - 1;
+    int red, green, blue;
+    if (aux < (faixa + 1)){
+        red = 255;
+        green = (125/faixa) * (aux % (faixa + 1));
+        blue = 0;
+    }else if (aux < (faixa + 1) * 2){
+        red = 255;
+        green = ((130/faixa) * (aux % (faixa + 1))) + 125;
+        blue = 0;
+    }else if (aux < (faixa + 1) * 3){
+        red = 255 - ((130/faixa) * (aux % (faixa + 1)));
+        green = 255;
+        blue = 0; 
+    }else if (aux < (faixa + 1) * 4){
+        red = 125 - ((125/faixa) * (aux % (faixa + 1)));
+        green = 255;
+        blue = 0; 
+    }else if (aux < (faixa + 1) * 5){
+        red = 0;
+        green = 255;
+        blue = (125/faixa) * (aux % (faixa + 1));
+    }else if (aux < (faixa + 1) * 6){
+        red = 0;
+        green = 255;
+        blue = ((130/faixa) * (aux % (faixa + 1))) + 125;
+    }else if (aux < (faixa + 1) * 7){
+        red = 0;
+        green = 255 - ((130/faixa) * (aux % (faixa + 1)));
+        blue = 255;
+    }else if (aux < (faixa + 1) * 8){
+        red = 0;
+        green = 125 - ((125/faixa) * (aux % (faixa + 1)));
+        blue = 255;
+    }else if (aux < (faixa + 1) * 9){
+        red = (125/faixa) * (aux % (faixa + 1));
+        green = 0;
+        blue = 255;
+    }else if (aux < (faixa + 1) * 10){
+        red = ((130/faixa) * (aux % (faixa + 1))) + 125;
+        green = 0;
+        blue = 255;
+    }else if (aux < (faixa + 1) * 11){
+        red = 255;
+        green = 0;
+        blue = 255 - ((130/faixa) * (aux % (faixa + 1)));
+    }else if (aux < (faixa + 1) * 12){
+        red = 255;
+        green = 0;
+        blue = 125 - ((125/faixa) * (aux % (faixa + 1)));
+    }
+
+    return al_map_rgb (red, green, blue);
+}
 
 void desenhar_quadrados(nodo_l_t* aux, lista_t* quadrados, ALLEGRO_FONT* fonte_quadrado){
     aux = quadrados->ini;
     for (int i = 0; i < quadrados->tamanho; i++){
-        al_draw_filled_rectangle(aux->quadrado.x, aux->quadrado.y, aux->quadrado.x + (SQUARE_EDGE), aux->quadrado.y + (SQUARE_EDGE), al_map_rgb_f(1, 0, 0));
+        al_draw_filled_rectangle(aux->quadrado.x, aux->quadrado.y, aux->quadrado.x + (SQUARE_EDGE), aux->quadrado.y + (SQUARE_EDGE), cor_quadrado(aux->quadrado.batidas));
         al_draw_textf (fonte_quadrado, al_map_rgb_f (0, 0, 0), aux->quadrado.x + SQUARE_EDGE/2, aux->quadrado.y + SQUARE_FONT_SIZE/2, 1, "%d", aux->quadrado.batidas);
 
         aux = aux->prox;  

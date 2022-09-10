@@ -11,6 +11,9 @@
 /* desenha os powerups na tela */
 void desenhar_powerups(nodo_powerup* aux_powerup, lista_powerup* powerups);
 
+/*determina a cor do quadrado  */
+ALLEGRO_COLOR cor_quadrado(int batidas);
+
 /* desenha os quadrados que estao em jogo na tela */
 void desenhar_quadrados(nodo_l_t* aux, lista_t* quadrados, ALLEGRO_FONT* fonte_quadrado);
 
