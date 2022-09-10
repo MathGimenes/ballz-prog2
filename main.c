@@ -46,6 +46,11 @@ int main() {
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FRAMES);
     inicializar (timer, "timer");
 
+    /* iniciando timer cheatcode */
+    ALLEGRO_TIMER* timer_cheatcode = al_create_timer(1);
+    inicializar (timer_cheatcode, "timer cheatcode");
+    int tempo_inicial;
+
     /* fila de eventos */
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
     inicializar (queue, "queue");
@@ -120,7 +125,7 @@ int main() {
 
 
     /* booleans para desenhar na tela e terminar execucao */
-    bool done = false;
+    bool fim = false;
     bool redraw = true;
     ALLEGRO_EVENT event;
 
@@ -198,7 +203,7 @@ int main() {
 
 
     /* booleanos auxiliares */
-    bool primeiro = false;
+    bool primeiro = false, desenhar_aviso = false;
     int primeiro_indice, indice_bolas = 0, quantidade_bolas = 1;
 
     int wave_atual = 0;
@@ -223,7 +228,7 @@ int main() {
 
         switch(event.type){
             case ALLEGRO_EVENT_TIMER:
-                
+
                 /* aleatoriza as novas posicoes de powerups/quadrados */
                 if (new_wave){
                     quantidade_aleatorizada = aleatorizar_wave();
@@ -465,7 +470,7 @@ int main() {
                     /* botao quit */
                     if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 175 && mousey < HEIGHT/2 - HEIGHT/6 + 225)){
                         al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                        done = true;
+                        fim = true;
                     }
                 }
 
@@ -484,7 +489,7 @@ int main() {
                     if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 175 && mousey < HEIGHT/2 - HEIGHT/6 + 225)){
                         al_stop_samples ();
                         al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                        done = true;
+                        fim = true;
                     }
                 }
 
@@ -501,7 +506,7 @@ int main() {
             case ALLEGRO_EVENT_KEY_DOWN:
                 /* sai do jogo */
                 if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
-                    done = true;
+                    fim = true;
                 
                 /* inicia a tela de pause */
                 if (event.keyboard.keycode == ALLEGRO_KEY_F2)
@@ -528,8 +533,19 @@ int main() {
                     caracteres_cheatcode++;
                     if (checar_cheatcode (string_cheatcode, caracteres_cheatcode, event.keyboard.keycode + 96)){
                         if (caracteres_cheatcode == 24){
-                            cheatcode = cheatcode ? false : true;
+                            if (cheatcode){
+                                cheatcode = false;
+                                desenhar_aviso = true;
+                                al_start_timer (timer_cheatcode);
+                                tempo_inicial = al_get_timer_count (timer_cheatcode);
+                            }else{
+                                cheatcode = true;
+                                desenhar_aviso = true;
+                                al_start_timer (timer_cheatcode);
+                                tempo_inicial = al_get_timer_count (timer_cheatcode);
+                            }
                             digitando_cheatcode = false;
+                            
                         }
                     }else
                         digitando_cheatcode = false;
@@ -540,7 +556,7 @@ int main() {
                 break;
 
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                done = true;
+                fim = true;
                 break;
 
             case ALLEGRO_EVENT_MOUSE_AXES:
@@ -557,7 +573,7 @@ int main() {
         
 
 
-        if(done) 
+        if(fim) 
             break;
 
         if(redraw && al_is_event_queue_empty(queue)) {
@@ -593,6 +609,18 @@ int main() {
                 desenha_game_over (fonte_hiscore);
             }
 
+            if (desenhar_aviso){
+                if (cheatcode)
+                    al_draw_text (fonte_hiscore, al_map_rgb_f (1, 1, 1), WIDTH/2, 100, 1, "Cheatcode ativado");
+                else
+                    al_draw_text (fonte_hiscore, al_map_rgb_f (1, 1, 1), WIDTH/2, 100, 1, "Cheatcode desativado");
+                if (al_get_timer_count (timer_cheatcode)- tempo_inicial > 2){
+                    desenhar_aviso = false;
+                    al_stop_timer (timer_cheatcode);
+                }
+            }
+                    
+
             al_flip_display(); 
 
             redraw = false;
@@ -619,6 +647,7 @@ int main() {
     al_destroy_sample(lancamento);
     al_destroy_display(disp);
     al_destroy_timer(timer);
+    al_destroy_timer(timer_cheatcode);
     al_destroy_event_queue(queue);
 
 
