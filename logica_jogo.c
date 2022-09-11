@@ -82,29 +82,71 @@ bool colide_quadrado (BOLA *bola, QUADRADO* quadrado){
         return false;
     
     if ((distanciax <= ((float)SQUARE_EDGE/2 + RAIO)) && distanciay < distanciax){
-        if (distanciax - distanciay > 3){
+        if (fabs(distanciax - distanciay) > RAIO){
             bola->vx *= -1;
             return true;
         }
     }
     if (distanciay <= ((float)SQUARE_EDGE/2 + RAIO + GAP_SIZE/2)){
-        if (distanciay - distanciax > 3){
+        if (fabs(distanciay - distanciax) > RAIO){
             bola->vy *= -1;
             return true;
         }
     }
     
     float distancia_pontos = ((distanciax - SQUARE_EDGE/2) * (distanciax - SQUARE_EDGE/2)) + ((distanciay - SQUARE_EDGE/2 ) * (distanciay - SQUARE_EDGE/2 ));
-
+    puts ("trocou canto");
     if (distancia_pontos <= (RAIO * RAIO )){
-        if (fabs (bola->vx) > fabs (bola->vy))
-            bola->vx *= -1;
-        else if (fabs (bola->vy) > fabs (bola->vx))
+        if ((bola->vx > 0) && (bola->vy < 0)){
+            if ((bola->y > quadrado->cy) && (bola->x < quadrado->cx))
+                bola->vx *= -1;
+            else if ((bola->y < quadrado->cy) && (bola->x > quadrado->cx))
+                bola->vy *= -1;
+            else {
+                if (fabs(bola->vx) > fabs(bola->vy))
+                    bola->vx *= -1;
+                else
+                    bola->vy *= -1;
+            } 
+        }else if ((bola->vx >0) && (bola->vy > 0)){
+            if ((bola->x > quadrado->cx) && (bola->y > quadrado->cy))
+                bola->vy *= -1;
+            else if ((bola->x < quadrado->cx) && (bola->y < quadrado->cy))
+                bola->vx *= -1;
+            else{
+                if (fabs(bola->vx) > fabs(bola->vy))
+                    bola->vx *= -1;
+                else
+                    bola->vy *= -1;
+            }
+        }else if ((bola->vx < 0) && (bola->vy > 0)){
+            if ((bola->x > quadrado->cx) && (bola->y < quadrado->cy))
+                bola->vx *= -1;
+            else if ((bola->x < quadrado->cx) && (bola->y > quadrado->cy))
+                bola->vy *=-1;
+            else{
+                if (fabs(bola->vx) > fabs(bola->vy))
+                    bola->vx *= -1;
+                else
+                    bola->vy *=-1;
+            }
+        }else if ((bola->vx < 0) && (bola->vy < 0)){
+            if ((bola->x < quadrado->cx) && (bola->y < quadrado->cy))
+                bola->vy *= -1;
+            else if ((bola->x > quadrado->cx) && (bola->y > quadrado->cy))
+                bola->vx *= -1;
+            else{
+                if (fabs(bola->vx) > fabs(bola->vy))
+                    bola->vx *= -1;
+                else
+                    bola->vy *= -1; 
+            }
+
+        }else if (bola->vx == bola->vy){
             bola->vy *= -1;
-        else{
             bola->vx *= -1;
+        }else
             bola->vy *= -1;
-        } 
 
         return true;
     }
