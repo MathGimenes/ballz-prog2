@@ -58,10 +58,10 @@ int main() {
 
 
     /* iniciando anti-aliasing */
-    al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
-    al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
-    al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
-
+    al_set_new_display_option (ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
+    al_set_new_display_option (ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
+    al_set_new_bitmap_flags (ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+    
     /* iniciando audio */
     inicializar (al_install_audio(), "audio");
     inicializar (al_init_acodec_addon(), "codeec de audio");
