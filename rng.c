@@ -1,3 +1,4 @@
+// GRR20211781 Matheus Gimenes da Silva Viana
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,8 +11,6 @@
 #define CHANCE5 97
 #define CHANCE6 99
 
-
-/* funcao que determina o numero de quadrados na proxima linha */
 int aleatorizar_wave (){
     int tmp = rand()%100;
 
@@ -27,8 +26,6 @@ int aleatorizar_wave (){
         return 6;
 }
 
-
-/* retorna um inteiro aleatorio com base no maximo e minimo informado */
 int aleatorio_range(int max, int min){
     return rand() % (max - min + 1) + min;
 }
@@ -51,8 +48,6 @@ int aleatorizar_powerup(int vetor_posicoes[], int quantidade){
     return tmp;
 }
 
-
-/* varre um vetor em busca de um numero, se encontrar retorna 0, retorna 1 caso contrarios */
 int existe_vetor (int vetor[], int numero_aleatorizado, int indice){
     for (int i = 0; i < indice; i++){
 
@@ -63,8 +58,6 @@ int existe_vetor (int vetor[], int numero_aleatorizado, int indice){
     return 1;
 }
 
-
-/* aleatoriza e retorna um vetor contendo as posições dos proximos quadrados */
 void aleatorizar_posicoes (int vetor_posicoes[], int quantidade){
    
     int i = 0;

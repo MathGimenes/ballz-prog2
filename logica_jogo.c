@@ -1,3 +1,4 @@
+// GRR20211781 Matheus Gimenes da Silva Viana
 #include <allegro5/allegro5.h>
 #include <string.h>
 #include <math.h>
