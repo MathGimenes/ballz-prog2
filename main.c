@@ -439,69 +439,70 @@ int main() {
 
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
                 /* calcula a direcao quando o usuario aperta o botao do mouse */
-                if (!bola_andando  && mousey < 680 && mousey > 100 && !help_window && !pause && !game_over){
-                    al_stop_samples();
-                    al_play_sample(lancamento, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                    bolas[0].lancada = true;
-                    constante = VELOCIDADE * VELOCIDADE / (((mousex - bolas[0].x) * (mousex - bolas[0].x)) + ((mousey - bolas[0].y) * (mousey - bolas[0].y))); 
-                    constante = sqrtf(constante);
-                    for (int i = 0; i < quantidade_bolas; i++){
-                        bolas[i].vx = (mousex - bolas[i].x) * constante;
-                        bolas[i].vy = (mousey - bolas[i].y) * constante;
-                        bola_andando = true;
+                if (event.mouse.button == 1){
+                    if (!bola_andando  && mousey < 680 && mousey > 100 && !help_window && !pause && !game_over){
+                        al_stop_samples();
+                        al_play_sample(lancamento, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                        bolas[0].lancada = true;
+                        constante = VELOCIDADE * VELOCIDADE / (((mousex - bolas[0].x) * (mousex - bolas[0].x)) + ((mousey - bolas[0].y) * (mousey - bolas[0].y))); 
+                        constante = sqrtf(constante);
+                        for (int i = 0; i < quantidade_bolas; i++){
+                            bolas[i].vx = (mousex - bolas[i].x) * constante;
+                            bolas[i].vy = (mousey - bolas[i].y) * constante;
+                            bola_andando = true;
+                        }
                     }
-                }
 
-                /* teste se o usuario apertou o botao na tela de pause*/
-                if (pause){
-                    /* botao continue */
-                    float posx1 = WIDTH/2 - WIDTH/4.5, posx2 = WIDTH/2 + WIDTH/4.5; 
-                    if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 25 && mousey < HEIGHT/2 - HEIGHT/6 + 75)){
-                        pause = false;
-                        al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                    /* teste se o usuario apertou o botao na tela de pause*/
+                    if (pause){
+                        /* botao continue */
+                        float posx1 = WIDTH/2 - WIDTH/4.5, posx2 = WIDTH/2 + WIDTH/4.5; 
+                        if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 25 && mousey < HEIGHT/2 - HEIGHT/6 + 75)){
+                            pause = false;
+                            al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                        }
+                        
+                        /* botao restart */
+                        if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 100 && mousey < HEIGHT/2 - HEIGHT/6 + 150)){
+                            pause = false;
+                            restart = true;
+                            al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                        }
+
+                        /* botao quit */
+                        if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 175 && mousey < HEIGHT/2 - HEIGHT/6 + 225)){
+                            al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                            fim = true;
+                        }
                     }
+
+                    /* teste se o usuario apertou o botao na tela de game over */
+                    if (game_over){
+                        float posx1 = WIDTH/2 - WIDTH/4.5, posx2 = WIDTH/2 + WIDTH/4.5; 
+                        /* botao restart */
+                        if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 100 && mousey < HEIGHT/2 - HEIGHT/6 + 150)){
+                            al_stop_samples ();
+                            al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                            pause = false;
+                            restart = true;
+                        }
+
+                        /* botao quit */
+                        if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 175 && mousey < HEIGHT/2 - HEIGHT/6 + 225)){
+                            al_stop_samples ();
+                            al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                            fim = true;
+                        }
+                    }
+
                     
-                    /* botao restart */
-                    if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 100 && mousey < HEIGHT/2 - HEIGHT/6 + 150)){
-                        pause = false;
-                        restart = true;
+                    /* testa se o usuario apertou o botao de pause */
+                    if ((mousex > WIDTH/20  &&  mousex < WIDTH/20 + 2 * PAUSE_WIDTH + 10) && (mousey > 20 && mousey < 20 + PAUSE_HEIGHT)){
                         al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                        pause = pause ? false:true;
                     }
 
-                    /* botao quit */
-                    if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 175 && mousey < HEIGHT/2 - HEIGHT/6 + 225)){
-                        al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                        fim = true;
-                    }
                 }
-
-                /* teste se o usuario apertou o botao na tela de game over */
-                if (game_over){
-                    float posx1 = WIDTH/2 - WIDTH/4.5, posx2 = WIDTH/2 + WIDTH/4.5; 
-                    /* botao restart */
-                    if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 100 && mousey < HEIGHT/2 - HEIGHT/6 + 150)){
-                        al_stop_samples ();
-                        al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                        pause = false;
-                        restart = true;
-                    }
-
-                    /* botao quit */
-                    if ((mousex > posx1 && mousex < posx2) && (mousey > HEIGHT/2 - HEIGHT/6 + 175 && mousey < HEIGHT/2 - HEIGHT/6 + 225)){
-                        al_stop_samples ();
-                        al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                        fim = true;
-                    }
-                }
-
-                
-                /* testa se o usuario apertou o botao de pause */
-                if ((mousex > WIDTH/20  &&  mousex < WIDTH/20 + 2 * PAUSE_WIDTH + 10) && (mousey > 20 && mousey < 20 + PAUSE_HEIGHT)){
-                    al_play_sample(clique, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                    pause = pause ? false:true;
-                }
-
-
                 break;
 
             case ALLEGRO_EVENT_KEY_DOWN:
