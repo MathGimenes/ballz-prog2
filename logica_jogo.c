@@ -13,6 +13,7 @@
 #define RAIO_POWERUP 15
 #define SQUARE_EDGE 62
 #define GAP_SIZE 5
+#define DIAGONAL 43.84062
 
 bool existe_hiscore (){
     FILE *hiscore = fopen ("resources/.hiscore", "r");
@@ -69,38 +70,34 @@ bool colide_piso (float y){
     return false;
 }
 
-
-
-
-
 bool colide_quadrado (BOLA *bola, QUADRADO* quadrado){
     float distanciax = fabs (bola->x - quadrado->cx), distanciay = fabs (bola->y - quadrado->cy);
 
-    if (distanciax > ((float)SQUARE_EDGE/2 + RAIO))
+    if (distanciax > (SQUARE_EDGE/2 + RAIO + GAP_SIZE/2))
         return false;
-    if (distanciay > ((float)SQUARE_EDGE/2 + RAIO + GAP_SIZE/2))
+    if (distanciay > (SQUARE_EDGE/2 + RAIO + GAP_SIZE/2))
         return false;
     
-    if ((distanciax <= ((float)SQUARE_EDGE/2 + RAIO)) && distanciay < distanciax){
-        if (fabs(distanciax - distanciay) > RAIO){
+    if ((distanciax <= ((float)SQUARE_EDGE/2 + RAIO + GAP_SIZE/2)) && distanciay < distanciax){
+        if (fabs(distanciax - distanciay) > 5){
             bola->vx *= -1;
             return true;
         }
     }
-    if (distanciay <= ((float)SQUARE_EDGE/2 + RAIO + GAP_SIZE/2)){
-        if (fabs(distanciay - distanciax) > RAIO){
+    if (distanciay <= ((float)SQUARE_EDGE/2 + RAIO + GAP_SIZE/2)&& distanciay > distanciax){
+        if (fabs(distanciay - distanciax) > 5){
             bola->vy *= -1;
             return true;
         }
     }
     
-    float distancia_pontos = ((distanciax - SQUARE_EDGE/2) * (distanciax - SQUARE_EDGE/2)) + ((distanciay - SQUARE_EDGE/2 ) * (distanciay - SQUARE_EDGE/2 ));
-    puts ("trocou canto");
-    if (distancia_pontos <= (RAIO * RAIO )){
+    float distancia_pontos = ((distanciax) * (distanciax )) + ((distanciay  ) * (distanciay ));
+    if (distancia_pontos <= ((RAIO + DIAGONAL) * (RAIO + DIAGONAL) )){
         if ((bola->vx > 0) && (bola->vy < 0)){
-            if ((bola->y > quadrado->cy) && (bola->x < quadrado->cx))
+            if ((bola->y < quadrado->cy) && (bola->x < quadrado->cx)){
                 bola->vx *= -1;
-            else if ((bola->y < quadrado->cy) && (bola->x > quadrado->cx))
+                }
+            else if ((bola->y > quadrado->cy) && (bola->x > quadrado->cx))
                 bola->vy *= -1;
             else {
                 if (fabs(bola->vx) > fabs(bola->vy))
@@ -109,9 +106,9 @@ bool colide_quadrado (BOLA *bola, QUADRADO* quadrado){
                     bola->vy *= -1;
             } 
         }else if ((bola->vx >0) && (bola->vy > 0)){
-            if ((bola->x > quadrado->cx) && (bola->y > quadrado->cy))
+            if ((bola->x > quadrado->cx) && (bola->y < quadrado->cy))
                 bola->vy *= -1;
-            else if ((bola->x < quadrado->cx) && (bola->y < quadrado->cy))
+            else if ((bola->x < quadrado->cx) && (bola->y > quadrado->cy))
                 bola->vx *= -1;
             else{
                 if (fabs(bola->vx) > fabs(bola->vy))
@@ -120,9 +117,9 @@ bool colide_quadrado (BOLA *bola, QUADRADO* quadrado){
                     bola->vy *= -1;
             }
         }else if ((bola->vx < 0) && (bola->vy > 0)){
-            if ((bola->x > quadrado->cx) && (bola->y < quadrado->cy))
+            if ((bola->x > quadrado->cx) && (bola->y > quadrado->cy))
                 bola->vx *= -1;
-            else if ((bola->x < quadrado->cx) && (bola->y > quadrado->cy))
+            else if ((bola->x < quadrado->cx) && (bola->y < quadrado->cy))
                 bola->vy *=-1;
             else{
                 if (fabs(bola->vx) > fabs(bola->vy))
@@ -131,9 +128,9 @@ bool colide_quadrado (BOLA *bola, QUADRADO* quadrado){
                     bola->vy *=-1;
             }
         }else if ((bola->vx < 0) && (bola->vy < 0)){
-            if ((bola->x < quadrado->cx) && (bola->y < quadrado->cy))
+            if ((bola->x < quadrado->cx) && (bola->y > quadrado->cy))
                 bola->vy *= -1;
-            else if ((bola->x > quadrado->cx) && (bola->y > quadrado->cy))
+            else if ((bola->x > quadrado->cx) && (bola->y < quadrado->cy))
                 bola->vx *= -1;
             else{
                 if (fabs(bola->vx) > fabs(bola->vy))

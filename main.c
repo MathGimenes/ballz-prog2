@@ -255,7 +255,7 @@ int main() {
                     for (int i = 0; i < quadrados->tamanho; i++){
                         aux->quadrado.y += speed_quadrados;
                         aux->quadrado.cy += speed_quadrados;
-                        if (aux->quadrado.y > 630){
+                        if (aux->quadrado.y > 570){
                             game_over = true;
                             al_play_sample(game_over_som, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                         }
